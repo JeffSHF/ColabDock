@@ -1,2 +1,2 @@
 # ColabDock
-Code for ColabDock paper
+The code will be released soon.
