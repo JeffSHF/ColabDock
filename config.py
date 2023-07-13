@@ -16,6 +16,7 @@ config = {
     },
 
     # optional, the native structure of the complex, used for calculating the RMSD and DockQ
+    # if not provided, set to None
     'native': {
         'pdb_path': './protein/4INS4/PDB/native.pdb',
         'chains': 'A,B,C,D',
