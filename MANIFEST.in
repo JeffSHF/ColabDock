@@ -1,1 +1,1 @@
-recursive-include ./colabdock *.pkl
+recursive-include . *.pkl
