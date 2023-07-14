@@ -1,16 +1,19 @@
 import numpy as np
 import joblib
+import os
 
 from colabdesign.af.prep import prep_pdb
 from colabdesign.af.loss import _get_rmsd_loss
 from colabdesign.af.alphafold.model import model
 from colabdock.utils import renum_pdb
+import colabdock
 
 
 class _rank:
     def __init__(self):
-        self.model_inter = joblib.load('./colabdock/weights_rank/inter.pkl')
-        self.model_intra = joblib.load('./colabdock/weights_rank/intra.pkl')
+        weight_path = os.path.dirname(colabdock.__file__)
+        self.model_inter = joblib.load(f'{weight_path}/weights_rank/inter.pkl')
+        self.model_intra = joblib.load(f'{weight_path}/weights_rank/intra.pkl')
 
     def rank_fea(self, iepoch):
         feature = []
