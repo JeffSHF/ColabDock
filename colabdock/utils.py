@@ -6,7 +6,7 @@ def prep_path(save_path):
   if not os.path.exists(f'{save_path}/gen'):
     os.makedirs(f'{save_path}/gen')
   if not os.path.exists(f'{save_path}/pred'):
-    os.makedirs(f'{save_path}/dis')
+    os.makedirs(f'{save_path}/pred')
   if not os.path.exists(f'{save_path}/docked'):
     os.makedirs(f'{save_path}/docked')
 

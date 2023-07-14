@@ -115,7 +115,7 @@ config = {
     # AF2 and ranking model
     ###########################################################################################################
     # AF2 weights dir
-    'data_dir': '/path/to/alphafold',
+    'data_dir': '/data/dell/alphafold',
 
     # whether use AF2 in bfloat
     'bfloat': True,
