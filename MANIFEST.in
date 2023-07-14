@@ -1,1 +1,1 @@
-include ./colabdock/weights_rank/*.pkl
+recursive-include ./colabdock *.pkl
