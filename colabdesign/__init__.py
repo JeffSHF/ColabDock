@@ -1,4 +1,4 @@
-from colabdesign.shared.utils import clear_mem
+# from colabdesign.shared.utils import clear_mem
 from colabdesign.af.model import mk_af_model
 from colabdesign.tr.model import mk_tr_model
 
