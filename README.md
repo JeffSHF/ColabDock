@@ -5,6 +5,12 @@ ColabDock is a docking framework developed based on [ColabDesign](https://github
 
 Before running the code, please set the variables in the config.py file according to the descriptive information.
 
+<a href="https://colab.research.google.com/github/JeffSHF/ColabDock/blob/dev/ColabDock.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
+Note the notebook is still under development.
+
 ### Contributors
 - Shihao Feng [@JeffSHF](https://github.com/JeffSHF)
 - Zhenyu Chen [@Dreams1de](https://github.com/Dreams1de)
