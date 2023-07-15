@@ -355,6 +355,11 @@ class _af_design:
     if e_temp is None: e_temp = temp
     if e_hard is None: e_hard = hard
 
+    if self._args["crop"] is False:
+      con_step = list(range(iters))
+    else:
+      con_step = list(range(iters//2, iters, save_every_n_step))
+
     loss_rest = []
     for i in range(iters):
       self.set_opt(soft=(soft+(e_soft-soft)*((i+1)/iters)),
@@ -367,7 +372,7 @@ class _af_design:
       self.step(lr_scale=lr_scale, backprop=backprop, crop=crop,
                 callback=callback, save_best=save_best, verbose=verbose, grad_clip=grad_clip)
 
-      if i % save_every_n_step == 0:
+      if i in con_step:
         self.gen_inputs.append(jax.tree_util.tree_map(np.array, self.aux["inputs"]))
         if self._args["crop"] is False:
           self.gen_outputs.append(jax.tree_util.tree_map(np.array, self.aux["pdb"]))
