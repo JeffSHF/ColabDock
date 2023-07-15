@@ -35,6 +35,7 @@ class ColabDock(_dock, _rank, _rest):
 
         self.step_num = step_num
         self.round_num = round_num
+        self.crop_len = crop_len
         self.prob_rest = prob_rest
         self.bfloat = bfloat
 
@@ -47,11 +48,6 @@ class ColabDock(_dock, _rank, _rest):
         self.split_templates = True
         self.msas = msa_path
         self.rm_template_seq = False
-
-        if crop_len is not None:
-            if crop_len >= len(self.seq_wt):
-                crop_len = None
-        self.crop_len = crop_len
 
         self.w_non = 1.0
         self.w_res = 2.0
@@ -70,6 +66,10 @@ class ColabDock(_dock, _rank, _rest):
                            chain=self.template['chains'],
                            for_alphafold=False)    
         self.seq_wt = ''.join([residue_constants.restypes[ind] for ind in tmp_obj['batch']['aatype']])
+
+        if self.crop_len is not None:
+            if self.crop_len >= len(self.seq_wt):
+                self.crop_len = None
         
         self.lens = np.array([np.where(tmp_obj['idx']['chain']==ichain)[0].size for ichain in self.template['chains'].split(',')])
         chains = self.template['chains'].split(',')
