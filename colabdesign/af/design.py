@@ -358,7 +358,7 @@ class _af_design:
     if self._args["crop"] is False:
       con_step = list(range(iters))
     else:
-      con_step = list(range(iters//2, iters, save_every_n_step))
+      con_step = list(range(iters//3, iters, save_every_n_step))
 
     loss_rest = []
     for i in range(iters):
