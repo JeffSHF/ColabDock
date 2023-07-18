@@ -28,10 +28,8 @@ config = {
     #     the relative position of chain A and B is fixed, also that of chain C and D.
     'fixed_chains': ['A,B', 'C,D'],
     
-
     ###########################################################################################################
     # experimental restraints
-    # at least one of the following 4 types of restraints should be given
     ###########################################################################################################
     # the threshold of the experimental restraints, usually set to 8.0Å.
     # Change to other values if you know the threshold of the restraints you provide.
@@ -111,7 +109,7 @@ config = {
     'save_every_n_step': 1,
 
     ###########################################################################################################
-    # AF2 and ranking model
+    # AF2 model
     ###########################################################################################################
     # AF2 weights dir
     'data_dir': '/path/to/alphafold',

@@ -8,7 +8,7 @@ class _rest:
         rest_MvN = rest_raw['MvN']
         rest_non = rest_raw['non']
 
-        assert not (rest_1v1 is None and rest_1vN is None and rest_MvN is None)
+        # assert not (rest_1v1 is None and rest_1vN is None and rest_MvN is None)
         # the indices of residues cropped out
         restraints_p = {'1v1': None,
                         '1vN': None,
@@ -107,5 +107,5 @@ class _rest:
             sample_p = [0 if ires is None else 1 for ires in sample_p]
             self.flag_valid = sample_p
             sample_p = np.array(sample_p)
-            sample_p = sample_p / sample_p.sum()
+            sample_p = sample_p / (sample_p.sum() + 1e-8)
             self.sample_p = sample_p.cumsum() * self.prob_rest

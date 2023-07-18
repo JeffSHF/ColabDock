@@ -307,7 +307,7 @@ class _af_design:
         loss_sample = [0 if iloss is None else iloss for iloss in self.loss_history]
         loss_sample = np.array(loss_sample) + pseudo_loss
         loss_sample *= flag_loss
-        sample_p = loss_sample / loss_sample.sum()
+        sample_p = loss_sample / (loss_sample.sum() + 1e-8)
         self.sample_p = sample_p.cumsum() * self._args["prob_rest"]
 
   def save_results(self, save_best=False, verbose=1):
