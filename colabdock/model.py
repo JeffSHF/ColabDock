@@ -130,6 +130,8 @@ class ColabDock(_dock, _rank, _rest):
             os.system(comm)
 
             _, _, dis_iptm, _, _, dis_rmsd, dis_satis_num, _ = feature_topk[ind]
-            print_str = (f'Top{ith+1} structure:\n\trmsd: {dis_rmsd:.3f}, iptm: {dis_iptm:.3f}, '
-                        + f'{int(dis_satis_num):d} out of {self.rest_num} restraints are satisfied.')
+            print_str = f'Top{ith+1} structure:\n\t'
+            if dis_rmsd is not None:
+                print_str += f'rmsd: {dis_rmsd:.3f}, '
+            print_str += (f'iptm: {dis_iptm:.3f}, {int(dis_satis_num):d} out of {self.rest_num} restraints are satisfied.')
             print(print_str)
