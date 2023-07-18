@@ -383,7 +383,7 @@ class _af_design:
         if "rest_non" in self.aux["log"].keys():
           iloss_rest.append(self.aux["log"]["rest_non"])
         loss_rest.append(iloss_rest)
-        if i > 10:
+        if iloss_rest and i > 10:
           loss_np = np.array(loss_rest)
           if (loss_np[-5:, :] < 0.05).sum() == 5*loss_np.shape[1]:
             break
