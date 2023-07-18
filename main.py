@@ -68,17 +68,16 @@ if __name__ == '__main__':
     else:
         print_str += f'\tnon restraints:\n\t\t{rest_MvN}\n'
     
-    print_str += '\n Optimization losses include:\n'
+    print_str += '\nOptimization losses include:\n\t'
     if rest_1v1 is not None:
-        print_str += '\t1v1 restraint loss'
+        print_str += '1v1 restraint loss, '
     if rest_1vN is not None:
-        print_str += ', 1vN restraint loss'
+        print_str += '1vN restraint loss, '
     if rest_MvN is not None:
-        print_str += ', MvN restraint loss'
+        print_str += 'MvN restraint loss, '
     if rest_non is not None:
-        print_str += ', non restraint loss'
-    print_str += ', distogram loss, pLDDT, and ipAE.'
-    print(print_str)
+        print_str += 'non restraint loss, '
+    print_str += 'distogram loss, pLDDT, and ipAE.\n'
 
     ######################################################################################
     # start docking
@@ -97,4 +96,8 @@ if __name__ == '__main__':
                            non_thres=non_thres,
                            save_every_n_step=save_every_n_step)
     dock_model.setup()
+    if dock_model.crop_len is not None:
+        print_str += 'Colabdock will work in segment based mode.'
+    print(print_str)
+    print('\nStart optimization')
     dock_model.dock_rank()
