@@ -38,10 +38,25 @@ pip install -r requirements.txt
 ```
 
 ### Usage
-Before running the code, please set the variables in the config.py file according to the descriptive information.
+Before running the code, please set the variables in the config.py file according to the descriptive information in it.
 ```bash
 conda activate colabdock && python main.py
 ```
+
+### Restraints example
+Suppose the complex you want to dock contains two chains, i.e., A and B, and each chain contains 10 amino acids. The "chains" variable in the config.py file is set to `'A,B'`.
+#### a. 1v1 restraint
+If you want the 4th residue in chain A is close to the 5th residue in chain B in the docking structure, the 1v1 restraint (`rest_1v1` variable in the config.py file) should be set to `[4, 15]`.  
+#### b. 1vN restraint
+If you want the 4th residue in chain A is close to one of residues from 3rd to 7th in chain B in the docking structure, the 1vN restraint (`rest_1vN` variable in the config.py file) should be set to `[4, range(13, 18)]`.  
+#### c. MvN restraint
+If you have two 1vN restraints, i.e., `[4, range(13, 18)]` and `[6, range(13, 18)]`, and you want at least one of them satisfied in the docking structure, the MvN restraint (`rest_MvN` variable in the config.py file) should be set to `[[4, range(13, 18)], [6, range(13, 18)], 1]`.  
+#### d. Repulsive restraint
+If you want the 6th residue in chain A is far away from the 8th residue in chain B in the docking structure, the repulsive restraint (`rest_rep` variable in the config.py file) should be set to `[6, 18]`.  
+
+
+### Link
+A blog in Chinese ([link](https://mp.weixin.qq.com/s/7-GE5Ueyq-7IpaezWUTyZA))
 
 ### Contributors
 - Shihao Feng [@JeffSHF](https://github.com/JeffSHF)
