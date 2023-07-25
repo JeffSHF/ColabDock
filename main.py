@@ -49,9 +49,9 @@ if __name__ == '__main__':
         print_str += f'\tMvN restraints:\n\t\t{rest_MvN_r}\n'
     
     if rest_non_r is None:
-        print_str += '\tno non restraints provided.\n'
+        print_str += '\tno repulsive restraints provided.\n'
     else:
-        print_str += f'\tnon restraints:\n\t\t{rest_non_r}\n'
+        print_str += f'\trepulsive restraints:\n\t\t{rest_non_r}\n'
 
     # 1v1
     if rest_1v1_r is not None:
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     if rest_MvN is not None:
         print_str += 'MvN restraint loss, '
     if rest_non is not None:
-        print_str += 'non restraint loss, '
+        print_str += 'repulsive restraint loss, '
     print_str += 'distogram loss, pLDDT, and ipAE.\n'
 
     ######################################################################################
