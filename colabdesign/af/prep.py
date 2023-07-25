@@ -23,8 +23,9 @@ idx_to_resname = dict((v,k) for k,v in resname_to_idx.items())
 #################################################
 class _af_prep:
   # prep functions specific to protocol
-  def _prep_dock(self, rest_set, template, fixed_chains=None, use_initial=True, msas=None,
-                 copies=1, repeat=False, block_diag=False, split_templates=True,
+  def _prep_dock(self, rest_set, template, fixed_chains=None, chain_weights=None,
+                 use_initial=True, msas=None, copies=1, repeat=False,
+                 block_diag=False, split_templates=True,
                  rm_template_seq=True, **kwargs):
     '''prep inputs for docking'''
     assert not (template is None and msas is None)
@@ -79,7 +80,7 @@ class _af_prep:
                                               all_atom_mask=pdb['batch']["all_atom_mask"])
     
     dm = np.sqrt(np.square(x_beta[:,None] - x_beta[None,:]).sum(-1))
-    dm_mask = np.where(dm < 22, 1, 0)
+    dm_mask = np.where(dm < 22, 1.0, 0.0)
     
     # mask_dist
     mask = np.zeros([self._len, self._len])
@@ -90,8 +91,18 @@ class _af_prep:
           jstart, jstop = boundaries[jchain], boundaries[jchain+1]
           mask[istart:istop, jstart:jstop] = 1
     mask += mask.T
-    mask = np.where(mask == 0, 0, 1)
-    self._batch['mask_d'] = jnp.array(mask * dm_mask)
+    mask = np.where(mask == 0, 0.0, 1.0)
+    self._batch['mask_d'] = mask * dm_mask
+
+    # mask chain weights
+    if chain_weights is not None:
+      for ik, iv in chain_weights.items():
+        if ik in chains:
+          ind = chains.index(ik)
+          istart, istop = boundaries[ind], boundaries[ind+1]
+          mask[istart:istop, istart:istop] *= iv
+
+    self._batch['mask_d_w'] = mask * dm_mask
 
     # generate initial position
     if use_initial:

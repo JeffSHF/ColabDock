@@ -18,6 +18,7 @@ class ColabDock(_dock, _rank, _rest):
                  structure_gt=None,
                  crop_len=None,
                  fixed_chains=None,
+                 chain_weights=None,
                  round_num=2,
                  step_num=50,
                  prob_rest=0.5,
@@ -28,6 +29,7 @@ class ColabDock(_dock, _rank, _rest):
         self.template = template
         self.structure_gt = structure_gt
         self.fixed_chains = fixed_chains
+        self.chain_weights = chain_weights
 
         self.rest_raw = restraints
         self.res_thres = res_thres

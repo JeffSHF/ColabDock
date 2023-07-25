@@ -10,22 +10,22 @@ config = {
     # template and native structure
     ###########################################################################################################
     # the structure of proteins you want to dock
-    'template': './4HFF/PDB/4HFF.pdb',
+    'template': './protein/4INS4/PDB/template.pdb',
 
     # optional, the native structure of the complex, used for calculating the RMSD and DockQ
     # if you do not have native structure, set it to None.
-    'native': './4HFF/PDB/4HFF.pdb',
+    'native': './protein/4INS4/PDB/native.pdb',
 
     # docking chains
     # This determines the order that the chain sequences are concatenated to form the complex sequence.
-    'chains': 'A,B',
+    'chains': 'A,B,C,D',
 
     # input the chainIDs if you want the relative position of chains is fixed as in the provided template
     # otherwise, set to None
     # example:
     #     'fixed_chains': ['A,B', 'C,D']
     #     the relative position of chain A and B is fixed, also that of chain C and D.
-    'fixed_chains': None,
+    'fixed_chains': ['A,B', 'C,D'],
 
     ###########################################################################################################
     # experimental restraints
@@ -47,7 +47,7 @@ config = {
     # example:
     #     'rest_1v1': [[78,198],[20,50]]
     #     The distance between 78th and 198th residue is below a given threshold, as well as the distance between 20th and 50th residue.
-    'rest_1v1': [79, 199],
+    'rest_1v1': None,
 
     # 1vN restraints
     # description:
@@ -72,7 +72,7 @@ config = {
     #                  [120, list(range(160, 170))],
     #                  2]
     #     2 of the 3 given 1vN restraints should be satisfied.
-    'rest_MvN': None,
+    'rest_MvN': joblib.load('./protein/4INS4/rest_MvN.pkl'),
     
     # the threshold of the repulsive restraints
     # Change to other values if you know the threshold of the restraints you provide.
@@ -86,18 +86,22 @@ config = {
     #     If you have multiple repulsive restraints, list them in [].
     #     The order number starts from 1.
     # example:
-    #     'rest_rep: [154, 250]
+    #     'rest_rep': [154, 250]
     #     The distance between 154th and 250th residue is above a given threshold
     'rest_rep': None,
 
     ###########################################################################################################
     # weights of each chain
     ###########################################################################################################
-    # if you allow the structures of certain chains in the final docking structure different from
+    # If you allow the structures of certain chains in the final docking structure different from
     # those in the input template, to better satisfy the given restraints, you can set this parameter.
-    # 
-
-    'chains_weight': None,
+    # Each chain has a value between 0 and 1. 0 means in the generation stage, ColabDock does not
+    # consider the structure of the corresponding chain in the input template. With this value increasing,
+    # the structure of the chain in the generation stage is getting similar to that in the input template.
+    # Normally, if your input template is accurate, you just need set it to None.
+    # example:
+    #     'chain_weights': {'A': 1}
+    'chain_weights': {'A': 0.0, 'B': 0.0},
 
     ###########################################################################################################
     # optimization parameters

@@ -28,6 +28,7 @@ class _dock:
         af_model.prep_inputs(rest_set=self.rest_set,
                              template=self.template,
                              fixed_chains=self.fixed_chains,
+                             chain_weights=self.chain_weights,
                              use_initial=self.use_initial,
                              msas=self.msas,
                              split_templates=self.split_templates,
