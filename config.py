@@ -10,17 +10,15 @@ config = {
     # template and native structure
     ###########################################################################################################
     # the structure of proteins you want to dock
-    'template': {
-        'pdb_path': './protein/4INS4/PDB/template.pdb',
-        'chains': 'A,B,C,D',
-    },
+    'template': './protein/4INS4/PDB/template.pdb',
 
     # optional, the native structure of the complex, used for calculating the RMSD and DockQ
     # if not provided, set to None
-    'native': {
-        'pdb_path': './protein/4INS4/PDB/native.pdb',
-        'chains': 'A,B,C,D',
-    },
+    'native': './protein/4INS4/PDB/native.pdb',
+
+    # docking chains
+    # This determines the order that the chain sequences are concatenated to form the complex sequence.
+    'chains': 'A,B,C,D',
 
     # input the chainIDs if you want the relative position of chains is fixed as in the provided template
     # otherwise, set to None
@@ -39,12 +37,16 @@ config = {
 
     # 1v1 restraints
     # description:
-    #     the distance between two residues is below a given threshold (res_thres)
-    #     if there is no such restraints, set to None
+    #     The distance between two residues is below a given threshold (res_thres).
+    #     If there is no such restraints, set to None.
+    #     If you have multiple 1v1 restraints, list them in a [].
+    #     The order number in a 1v1 restraint refers to the residue in the complex sequence.
+    #         The complex sequence is concatenated by the chain sequences and the order is determined by the "chains" provided above.
+    #         This is the same for the remaining types of restraints.
+    #     The order number starts from 1.
     # example:
-    #     'rest_1v1': np.array([[78, 198]])
-    #     the distance between 78th and 198th residue is below a given threshold
-    #     the order number starts from 0
+    #     'rest_1v1': [[78,198],[20,50]]
+    #     The distance between 78th and 198th residue is below a given threshold, as well as the distance between 20th and 50th residue.
     'rest_1v1': None,
 
     # 1vN restraints
