@@ -91,15 +91,6 @@ config = {
     'rest_rep': None,
 
     ###########################################################################################################
-    # weights of each chain
-    ###########################################################################################################
-    # if you allow the structures of certain chains in the final docking structure different from
-    # those in the input template, to better satisfy the given restraints, you can set this parameter.
-    # 
-
-    'chains_weight': None,
-
-    ###########################################################################################################
     # optimization parameters
     ###########################################################################################################
     # if in segment based optimization, set to the length of the segment, for example 200.
