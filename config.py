@@ -13,6 +13,7 @@ config = {
     'template': './protein/4INS4/PDB/template.pdb',
 
     # optional, the native structure of the complex, used for calculating the RMSD and DockQ
+    # if you do not have native structure, set it to None.
     'native': './protein/4INS4/PDB/native.pdb',
 
     # docking chains
