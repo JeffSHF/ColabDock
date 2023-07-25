@@ -10,22 +10,22 @@ config = {
     # template and native structure
     ###########################################################################################################
     # the structure of proteins you want to dock
-    'template': './protein/4INS4/PDB/template.pdb',
+    'template': './4HFF/PDB/4HFF.pdb',
 
     # optional, the native structure of the complex, used for calculating the RMSD and DockQ
-    # if not provided, set to None
-    'native': './protein/4INS4/PDB/native.pdb',
+    # if you do not have native structure, set it to None.
+    'native': './4HFF/PDB/4HFF.pdb',
 
     # docking chains
     # This determines the order that the chain sequences are concatenated to form the complex sequence.
-    'chains': 'A,B,C,D',
+    'chains': 'A,B',
 
     # input the chainIDs if you want the relative position of chains is fixed as in the provided template
     # otherwise, set to None
     # example:
     #     'fixed_chains': ['A,B', 'C,D']
     #     the relative position of chain A and B is fixed, also that of chain C and D.
-    'fixed_chains': ['A,B', 'C,D'],
+    'fixed_chains': None,
 
     ###########################################################################################################
     # experimental restraints
@@ -47,45 +47,57 @@ config = {
     # example:
     #     'rest_1v1': [[78,198],[20,50]]
     #     The distance between 78th and 198th residue is below a given threshold, as well as the distance between 20th and 50th residue.
-    'rest_1v1': None,
+    'rest_1v1': [79, 199],
 
     # 1vN restraints
     # description:
-    #     the distance between one residue and a residue set is below a given threshold (res_thres)
-    #     if there is no such restraints, set to None
+    #     The distance between one residue and a residue set is below a given threshold (res_thres).
+    #     If there is no such restraints, set to None.
+    #     If you have multiple 1v1 restraints, list them in [].
+    #     The order number starts from 1.
     # example:
-    #     'rest_1vN': [[36, np.array(range(160, 170))]]
-    #     the distance between 36th residue and at least a residue from 160th to 170th is below a given threshold
-    #     the order number starts from 0
+    #     'rest_1vN': [36,list(range(160,171))+[178,190]]
+    #     The distance between the 36th residue and at least a residue from 160th to 170th, 178th, and 190th is below a given threshold.
     'rest_1vN': None,
 
     # MvN restraints
     # description:
-    #     contain several 1vN restraints, and only a specific number of them are satisfied
-    #     if there is no such restraints, set to None
+    #     Contain several 1vN restraints, and only a specific number of them are satisfied.
+    #     If there is no such restraints, set to None.
+    #     If you have multiple MvN restraints, list them in [].
+    #     The order number starts from 1.
     # example:
-    #     'rest_MvN': [[[10, np.array(range(160, 170))],
-    #                   [78, np.array(range(160, 170))],
-    #                   [120, np.array(range(160, 170))],
-    #                  2]]
-    #     2 of the 3 given 1vN restraints should be satisfied
-    #     the order number starts from 0
-    'rest_MvN': joblib.load('./protein/4INS4/rest_MvN.pkl'),
+    #     'rest_MvN': [[10, list(range(160, 170))],
+    #                  [78, list(range(160, 170))],
+    #                  [120, list(range(160, 170))],
+    #                  2]
+    #     2 of the 3 given 1vN restraints should be satisfied.
+    'rest_MvN': None,
     
-    # the threshold of the non restraints
+    # the threshold of the repulsive restraints
     # Change to other values if you know the threshold of the restraints you provide.
     # Due to the definition of distogram in AF2, threshold should be set to a value between 2Å and 22Å
-    'non_thres': 8.0,
+    'rep_thres': 8.0,
 
-    # non restraints
+    # repulsive restraints
     # description:
-    #     the distance between two residues is above a given threshold (non_thres)
-    #     if there is no such restraints, set to None
+    #     The distance between two residues is above a given threshold (rep_thres).
+    #     If there is no such restraints, set to None.
+    #     If you have multiple repulsive restraints, list them in [].
+    #     The order number starts from 1.
     # example:
-    #     'rest_non: np.array([[154, 250]])
-    #     the distance between 154th and 250th residue is above a given threshold
-    #     the order number starts from 0
-    'rest_non': None,
+    #     'rest_rep: [154, 250]
+    #     The distance between 154th and 250th residue is above a given threshold
+    'rest_rep': None,
+
+    ###########################################################################################################
+    # weights of each chain
+    ###########################################################################################################
+    # if you allow the structures of certain chains in the final docking structure different from
+    # those in the input template, to better satisfy the given restraints, you can set this parameter.
+    # 
+
+    'chains_weight': None,
 
     ###########################################################################################################
     # optimization parameters
