@@ -85,7 +85,7 @@ if __name__ == '__main__':
     else:
         rest_MvN = None
     
-    # 1v1
+    # repulsive
     if rest_non_r is not None:
         if type(rest_non_r[0]) is not list:
             rest_non_r = [rest_non_r]

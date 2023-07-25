@@ -43,6 +43,14 @@ Before running the code, please set the variables in the config.py file accordin
 conda activate colabdock && python main.py
 ```
 
+### Restraints sampling
+If you want to test ColabDock using a complex with known structure, you can generate 1v1, 1vN, or MvN restraints using the extract_rest.py script. For example, 4INS4 contains 4 protein chains, i.e., A,B,C,D. If you want to sample some 1v1 restraints between chain A and chain D, then run the following command and the program will print the sampled restraints.
+```python
+python extract_rest.py ./protein/4INS4/PDB/native.pdb A,B,C,D A,D 1v1
+```
+You can also use `python extract_rest.py -h` to get more informations about the input parameters.
+
+
 ### Restraints example
 Suppose the complex you want to dock contains two chains, i.e., A and B, and each chain contains 10 amino acids. The "chains" variable in the config.py file is set to `'A,B'`.
 #### a. 1v1 restraint
@@ -54,8 +62,7 @@ If you have two 1vN restraints, i.e., `[4, range(13, 18)]` and `[6, range(13, 18
 #### d. Repulsive restraint
 If you want the 6th residue in chain A far away from the 8th residue in chain B in the docking structure, the repulsive restraint (`rest_rep` variable in the config.py file) should be set to `[6, 18]`.  
 
-
-### Link
+### Links
 A blog in Chinese ([link](https://mp.weixin.qq.com/s/7-GE5Ueyq-7IpaezWUTyZA))
 
 ### Contributors
