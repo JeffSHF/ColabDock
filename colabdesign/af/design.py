@@ -390,5 +390,5 @@ class _af_design:
         loss_rest.append(iloss_rest)
         if iloss_rest and i > 10:
           loss_np = np.array(loss_rest)
-          if (loss_np[-5:, :] < 0.05).sum() == 5*loss_np.shape[1]:
+          if (loss_np[-5:, :] < 0.1).sum() == 5*loss_np.shape[1]:
             break
