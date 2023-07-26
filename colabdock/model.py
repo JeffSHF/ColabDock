@@ -133,5 +133,5 @@ class ColabDock(_dock, _rank, _rest):
             print_str = f'Top{ith+1} structure:\n\t'
             if dis_rmsd is not None:
                 print_str += f'rmsd: {dis_rmsd:.3f}, '
-            print_str += (f'iptm: {dis_iptm:.3f}, {int(dis_satis_num):d} out of {self.rest_num} restraints are satisfied.')
+            print_str += (f'iptm: {dis_iptm:.3f}, {int(dis_satis_num):d} out of {int(self.rest_num)} restraints are satisfied.')
             print(print_str)
