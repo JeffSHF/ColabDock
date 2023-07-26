@@ -95,13 +95,12 @@ config = {
     ###########################################################################################################
     # If you allow the structures of certain chains in the final docking structure different from
     # those in the input template, to better satisfy the given restraints, you can set this parameter.
-    # Each chain has a value between 0 and 1. 0 means in the generation stage, ColabDock does not
-    # consider the structure of the corresponding chain in the input template. With this value increasing,
-    # the structure of the chain in the generation stage is getting similar to that in the input template.
+    # Each chain has a value between 0 and 1. With this value increasing, the structure of the chain 
+    # in the generation stage is getting similar to that in the input template.
     # Normally, if your input template is accurate, you just need set it to None.
     # example:
     #     'chain_weights': {'A': 1}
-    'chain_weights': {'A': 0.0, 'B': 0.0},
+    'chain_weights': {'A': 0.5},
 
     ###########################################################################################################
     # optimization parameters
