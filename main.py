@@ -112,6 +112,11 @@ if __name__ == '__main__':
     bfloat = config.bfloat
 
     ######################################################################################
+    # chain weights
+    ######################################################################################
+    chain_weights = config.chain_weights
+
+    ######################################################################################
     # print setting
     ######################################################################################
     print_str += '\nOptimization losses include:\n\t'
@@ -135,6 +140,7 @@ if __name__ == '__main__':
                            structure_gt=native,
                            crop_len=crop_len,
                            fixed_chains=fixed_chains,
+                           chain_weights=chain_weights,
                            round_num=rounds,
                            step_num=step_num,
                            bfloat=bfloat,

@@ -26,8 +26,7 @@ class _af_loss:
     # dgram loss
     aatype = inputs["aatype"]
     dgram_cce = get_dgram_loss(batch, outputs, copies=copies, aatype=aatype, return_cce=True)
-    mask = batch['mask_d']
-    dgram_cce = (dgram_cce * mask).sum() / (mask.sum() + 1e-8)
+    dgram_cce = (dgram_cce * batch['mask_d_w']).sum() / (batch['mask_d'].sum() + 1e-8)
     aux["losses"].update({"dgram_cce": dgram_cce})
 
     dgram = outputs["distogram"]["logits"]
