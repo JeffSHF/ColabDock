@@ -100,7 +100,7 @@ class _rest:
                          'rest_mask': restraints_mask,
                          'rest_MvN_num': rest_MvN_num}
         
-        self.rest_num = rest_num if rest_num != 0 else 1
+        self.rest_num = rest_num + 1e-8
         
         if self.crop_len is not None:
             sample_p = [rest_1v1, rest_1vN, rest_MvN, rest_non]
