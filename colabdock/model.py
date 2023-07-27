@@ -55,7 +55,7 @@ class ColabDock(_dock, _rank, _rest):
     
     def setup(self):
         # process the input structures
-        if self.structure_gt is not None:
+        if self.structure_gt['pdb_path'] is not None:
             self.gt_obj = prep_pdb(self.structure_gt['pdb_path'],
                                    chain=self.structure_gt['chains'],
                                    for_alphafold=False)
