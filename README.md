@@ -1,16 +1,15 @@
 # ColabDock
 ### Inverting AlphaFold2 structure prediction model for protein-protein docking with experimental restraints
 
-![pipeline](https://github.com/JeffSHF/ColabDock/assets/88184243/62b65508-6bbf-46f5-a4c0-72206b5e09fe)
+<img src="https://github.com/JeffSHF/ColabDock/assets/88184243/62b65508-6bbf-46f5-a4c0-72206b5e09fe" alt="ColabDock"/>
 ColabDock is a docking framework developed based on [ColabDesign](https://github.com/sokrypton/ColabDesign.git). It is able to incorporate experimental restraints to generate accurate protein complex structure. For details, please refer to the [paper](https://doi.org/10.1101/2023.07.04.547599).
 
+Note running ColabDock locally requires GPU. If you do not have one, we suggest using the Colab version.
 <a href="https://colab.research.google.com/github/JeffSHF/ColabDock/blob/dev/ColabDock.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
-Note the notebook is still under development.
-
-### Installation
+### Installation on Linux
 1. Create a python enviroment using conda.
 ```bash
 conda create --name colabdock python=3.8
@@ -33,16 +32,31 @@ pip install https://storage.googleapis.com/jax-releases/cuda11/jaxlib-0.3.8+cuda
 pip install jax==0.3.8
 ```
 
-4. Install other dependencies
+5. Install other dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
+6. Download AlphaFold2 parameters
+Download the parameter
+```bash
+mkdir params
+cd params
+wget https://storage.googleapis.com/alphafold/alphafold_params_2022-12-06.tar
+tar -xvf alphafold_params_2022-12-06.tar
+
+The installation takes ~10 min.
+
 ### Usage
 Before running the code, please set the variables in the config.py file according to the descriptive information in it.
+The default config.py contains the setting of protein 4INS4.
 ```bash
 conda activate colabdock && python main.py
 ```
+The running time depends on the size of the protein, the round and step numbers. For the default setting, it should take ~10 min.
+
+After the running, the outputs directory (default is `results`) contains three folders, i.e., gen, pred, and docked. Gen and pred contain the pdb files of all the docking structures derived from the generation stage and the prediction stage. The docked folder contains the top5 predicted docking structures.
+
 
 ### Restraints sampling
 If you want to test ColabDock using a complex with known structure, you can generate 1v1, 1vN, or MvN restraints using the extract_rest.py script. For example, 4INS4 contains 4 protein chains, i.e., A,B,C,D. If you want to sample some 1v1 restraints between chain A and chain D, then run the following command and the program will print the sampled restraints.

@@ -118,7 +118,7 @@ config = {
     # AF2 model
     ###########################################################################################################
     # AF2 weights dir
-    'data_dir': '/path/to/alphafold',
+    'data_dir': './params',
 
     # whether use AF2 in bfloat
     'bfloat': True,
