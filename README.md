@@ -44,7 +44,7 @@ mkdir params
 cd params
 wget https://storage.googleapis.com/alphafold/alphafold_params_2022-12-06.tar
 tar -xvf alphafold_params_2022-12-06.tar
-
+```
 The installation takes ~10 min.
 
 ### Usage
