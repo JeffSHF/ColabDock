@@ -38,7 +38,6 @@ pip install -r requirements.txt
 ```
 
 6. Download AlphaFold2 parameters
-Download the parameter
 ```bash
 mkdir params
 cd params
@@ -55,7 +54,7 @@ conda activate colabdock && python main.py
 ```
 The running time depends on the size of the protein, the round and step numbers. For the default setting, it should take ~10 min.
 
-After the running, the outputs directory (default is `results`) contains three folders, i.e., gen, pred, and docked. Gen and pred contain the pdb files of all the docking structures derived from the generation stage and the prediction stage. The docked folder contains the top5 predicted docking structures.
+After the running, the outputs directory (default is `results`) will contain three folders, i.e., gen, pred, and docked. Gen and pred contain the pdb files of all the docking structures derived from the generation stage and the prediction stage. The docked folder contains the top5 predicted docking structures.
 
 
 ### Restraints sampling
