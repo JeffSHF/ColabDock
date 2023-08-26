@@ -1,6 +1,7 @@
 # ColabDock
 ### Inverting AlphaFold2 structure prediction model for protein-protein docking with experimental restraints
 
+![pipeline](https://github.com/JeffSHF/ColabDock/assets/88184243/62b65508-6bbf-46f5-a4c0-72206b5e09fe)
 ColabDock is a docking framework developed based on [ColabDesign](https://github.com/sokrypton/ColabDesign.git). It is able to incorporate experimental restraints to generate accurate protein complex structure. For details, please refer to the [paper](https://doi.org/10.1101/2023.07.04.547599).
 
 <a href="https://colab.research.google.com/github/JeffSHF/ColabDock/blob/dev/ColabDock.ipynb">
@@ -24,7 +25,7 @@ cd ColabDock && conda activate colabdock
 ```
 4. Install jax  
 <b>Please refer to [JAX github](https://github.com/google/jax) page to install package corresponding to your CUDA and cudnn version.</b>  
-Example:
+Example (which has been tested locally):
 ```bash
 # install jaxlib
 pip install https://storage.googleapis.com/jax-releases/cuda11/jaxlib-0.3.8+cuda11.cudnn805-cp38-none-manylinux2014_x86_64.whl
