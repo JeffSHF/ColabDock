@@ -76,6 +76,9 @@ If you have two 1vN restraints, i.e., `[4, range(13, 18)]` and `[6, range(13, 18
 #### d. Repulsive restraint
 If you want the 6th residue in chain A far away from the 8th residue in chain B in the docking structure, the repulsive restraint (`rest_rep` variable in the config.py file) should be set to `[6, 18]`.  
 
+### Restraints used in the paper
+In ColabDock paper, we sampled restraints for proteins collected from [protein docking benchmark 5.5](https://doi.org/10.1016/j.jmb.2015.07.016). The sampled restraints can be downloaded from [OSF](https://doi.org/10.17605/OSF.IO/N6R48).
+
 ### Links
 A blog in Chinese ([link](https://mp.weixin.qq.com/s/7-GE5Ueyq-7IpaezWUTyZA))
 
