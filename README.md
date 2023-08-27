@@ -9,7 +9,7 @@ Note running ColabDock locally requires GPU. If you do not have one, we suggest 
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
-
+<b>Table of content</b>
 - [ColabDock](#colabdock)
     - [Installation on Linux](#installation-on-linux)
     - [Usage](#usage)
