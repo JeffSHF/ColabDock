@@ -1,5 +1,5 @@
 # ColabDock
-### Inverting AlphaFold2 structure prediction model for protein-protein docking with experimental restraints
+<b>Inverting AlphaFold2 structure prediction model for protein-protein docking with experimental restraints</b>
 
 ![ColabDock](https://github.com/JeffSHF/ColabDock/assets/88184243/62b65508-6bbf-46f5-a4c0-72206b5e09fe)
 ColabDock is a docking framework developed based on [ColabDesign](https://github.com/sokrypton/ColabDesign.git). It is able to incorporate experimental restraints to generate accurate protein complex structure. For details, please refer to the [paper](https://doi.org/10.1101/2023.07.04.547599).
@@ -8,6 +8,21 @@ Note running ColabDock locally requires GPU. If you do not have one, we suggest 
 <a href="https://colab.research.google.com/github/JeffSHF/ColabDock/blob/dev/ColabDock.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
+
+
+- [ColabDock](#colabdock)
+    - [Installation on Linux](#installation-on-linux)
+    - [Usage](#usage)
+    - [Restraints sampling](#restraints-sampling)
+    - [Restraints example](#restraints-example)
+      - [a. 1v1 restraint](#a-1v1-restraint)
+      - [b. 1vN restraint](#b-1vn-restraint)
+      - [c. MvN restraint](#c-mvn-restraint)
+      - [d. Repulsive restraint](#d-repulsive-restraint)
+    - [Restraints used in the paper](#restraints-used-in-the-paper)
+    - [Links](#links)
+    - [Contributors](#contributors)
+
 
 ### Installation on Linux
 1. Create a python enviroment using conda.
