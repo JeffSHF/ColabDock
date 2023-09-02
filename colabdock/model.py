@@ -132,7 +132,7 @@ class ColabDock(_dock, _rank, _rest):
             for ith, ind in enumerate(sel_idx):
                 iepoch, istep = idx_topk[ind]
                 if ith == 0:
-                    pdbname = 'best'
+                    pdbname = '1st_best'
                 elif ith == 1:
                     pdbname = '2nd_best'
                 elif ith == 2:
