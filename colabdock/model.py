@@ -126,14 +126,32 @@ class ColabDock(_dock, _rank, _rest):
         sel_idx = self.rank_struct(self.model_inter, feature_topk[:, :5])
 
         # save top5 structures
-        for ith, ind in enumerate(sel_idx):
-            iepoch, istep = idx_topk[ind]
-            comm = f'cp {self.save_path}/pred/pred_{iepoch+1}_{istep+1}.pdb {self.save_path}/docked/top{ith+1}.pdb'
-            os.system(comm)
+        with open(f'{self.save_path}/docked/summary.txt', 'w') as f:
+            f.write('pdb\t')
+            if self.gt_obj is not None:
+                f.write('RMSD\t')
+            f.write('iptm\t# of satisfied restraints\n')
+            for ith, ind in enumerate(sel_idx):
+                iepoch, istep = idx_topk[ind]
+                if ith == 0:
+                    pdbname = 'best'
+                elif ith == 1:
+                    pdbname = '2nd_best'
+                elif ith == 2:
+                    pdbname = '3rd_best'
+                elif ith == 3:
+                    pdbname = '4th_best'
+                elif ith == 4:
+                    pdbname = '5th_best'
+                comm = f'cp {self.save_path}/pred/pred_{iepoch+1}_{istep+1}.pdb {self.save_path}/docked/{pdbname}.pdb'
+                os.system(comm)
 
-            _, _, dis_iptm, _, _, dis_rmsd, dis_satis_num, _ = feature_topk[ind]
-            print_str = f'Top{ith+1} structure:\n\t'
-            if dis_rmsd is not None:
-                print_str += f'rmsd: {dis_rmsd:.3f}, '
-            print_str += (f'iptm: {dis_iptm:.3f}, {int(dis_satis_num):d} out of {int(self.rest_num)} restraints are satisfied.')
-            print(print_str)
+                _, _, dis_iptm, _, _, dis_rmsd, dis_satis_num, _ = feature_topk[ind]
+                print_str = f'{pdbname} structure:\n\t'
+                f.write(f'{pdbname}.pdb\t')
+                if dis_rmsd is not None:
+                    print_str += f'rmsd: {dis_rmsd:.3f}, '
+                    f.write(f'{dis_rmsd:.3f}\t')
+                print_str += (f'iptm: {dis_iptm:.3f}, {int(dis_satis_num):d} out of {int(self.rest_num)} restraints are satisfied.')
+                print(print_str)
+                f.write(f'{dis_iptm:.3f}\t{int(dis_satis_num)}/{int(self.rest_num)}\n')
