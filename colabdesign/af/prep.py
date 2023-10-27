@@ -82,7 +82,7 @@ class _af_prep:
     dm_mask = np.where(dm < 22, 1, 0)
     
     # mask_dist
-    mask = np.zeros([self._len, self._len])
+    mask = np.zeros([self._len, self._len], dtype=np.float32)
     for iclique in cliques:
       for ichain in iclique:
         istart, istop = boundaries[ichain], boundaries[ichain+1]
