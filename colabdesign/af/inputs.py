@@ -174,7 +174,7 @@ def crop_feat(feat, pos, model_runner, add_batch=True):
         new_feat['prev']['prev_msa_first_row'] = v['prev_msa_first_row'][pos]
         new_feat['prev']['prev_pair'] = v['prev_pair'][pos, :][:, pos]
         new_feat['prev']['prev_pos'] = v['prev_pos'][pos]
-      elif k == 'mask_d':
+      elif k == 'mask_d' or k == 'mask_d_w':
         new_feat[k] = v[pos, :][:, pos]
       elif k == 'masks_rest':
         masks = {}
