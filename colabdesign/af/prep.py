@@ -23,8 +23,9 @@ idx_to_resname = dict((v,k) for k,v in resname_to_idx.items())
 #################################################
 class _af_prep:
   # prep functions specific to protocol
-  def _prep_dock(self, rest_set, template, fixed_chains=None, use_initial=True, msas=None,
-                 copies=1, repeat=False, block_diag=False, split_templates=False,
+  def _prep_dock(self, rest_set, template, fixed_chains=None, chain_weights=None,
+                 use_initial=True, msas=None, copies=1, repeat=False,
+                 block_diag=False, split_templates=False,
                  use_dgram=True, rm_template_seq=True, **kwargs):
     '''prep inputs for docking'''
     assert not (template is None and msas is None)
@@ -181,6 +182,16 @@ class _af_prep:
     mask = np.where(mask == 0, 0., 1.)
     self._batch['mask_d'] = jnp.array(mask * dm_mask)
     self._batch['mask_dgram'] = mask
+
+    # mask chain weights
+    if chain_weights is not None:
+      for ik, iv in chain_weights.items():
+        if ik in chains:
+          ind = chains.index(ik)
+          istart, istop = boundaries[ind], boundaries[ind+1]
+          mask[istart:istop, istart:istop] *= iv
+
+    self._batch['mask_d_w'] = mask * dm_mask
 
     # update template features
     if self._args["use_templates"]:
