@@ -47,7 +47,8 @@ class ColabDock(_dock, _rank, _rest):
 
         self.use_initial = True
         self.use_aatype = True
-        self.split_templates = True
+        self.split_templates = False
+        self.use_dgram = True
         self.msas = msa_path
         self.rm_template_seq = True if self.chain_weights else False
 

@@ -53,47 +53,63 @@ class _af_inputs:
                                                self._batch["all_atom_positions"],
                                                self._batch["all_atom_mask"])
       
-    # define template features
-    template_feats = {"template_aatype": template_aatype,
-                      "template_all_atom_positions": self._batch["all_atom_positions"],
-                      "template_all_atom_mask": self._batch["all_atom_mask"],
-                      "template_pseudo_beta": pb,
-                      "template_pseudo_beta_mask": pb_mask}
-
-    # protocol specific template injection
     bounds = [0] + list(np.cumsum(self.lens))
-    for k, v in template_feats.items():
-      if self.split_templates:
-        for ith, iclique in enumerate(self.cliques):
-          for ichain in iclique:
-            v_set = v[bounds[ichain]:bounds[ichain + 1]]
-            inputs[k] = inputs[k].at[ith, bounds[ichain]:bounds[ichain + 1]].set(v_set)
-      else:
-        inputs[k] = inputs[k].at[0].set(v)
-        
-      if k == "template_all_atom_masks" and self._args["rm_template_seq"]:
-        inputs[k] = inputs[k].at[:,:,5:].set(0)
+    if self.use_dgram:
+      template_dgram = model.modules.dgram_from_positions(pb, **self._runner.config.model.embeddings_and_evoformer.template.dgram_features)
+      template_mask_2d = self._batch['mask_dgram']
+      template_dgram = template_dgram * template_mask_2d[..., None]
+      dgram_mask = jax.random.bernoulli(key, 1-opt["template"]["dropout"],(L,L))
+      template_dgram *= dgram_mask[..., None]
+      inputs['template_dgram'] = jnp.stack([template_dgram, jnp.zeros_like(template_dgram)])
+      inputs['template_mask_2d'] = jnp.stack([template_mask_2d, jnp.zeros_like(template_mask_2d)])
+      inputs['template_aatype'] = jnp.stack([template_aatype, template_aatype])
+      inputs['template_all_atom_positions'] = inputs['template_all_atom_positions'].at[0].set(self._batch["all_atom_positions"])
+      inputs['template_all_atom_mask'] = inputs['template_all_atom_mask'].at[0].set(self._batch["all_atom_mask"])
 
-    # dropout template input features
-    L = inputs["template_aatype"].shape[1]
-    n = self._target_len if self.protocol == "binder" else 0
-    pos_mask = jax.random.bernoulli(key, 1-opt["template"]["dropout"],(L,))
-    inputs["template_all_atom_mask"] = inputs["template_all_atom_mask"].at[:,n:].multiply(pos_mask[n:,None])
-    inputs["template_pseudo_beta_mask"] = inputs["template_pseudo_beta_mask"].at[:,n:].multiply(pos_mask[n:])
-  
+      if self._args["rm_template_seq"]:
+        inputs['template_all_atom_masks'] = inputs['template_all_atom_masks'].at[:,:,5:].set(0)
+    else:
+      # define template features
+      template_feats = {"template_aatype": template_aatype,
+                        "template_all_atom_positions": self._batch["all_atom_positions"],
+                        "template_all_atom_mask": self._batch["all_atom_mask"],
+                        "template_pseudo_beta": pb,
+                        "template_pseudo_beta_mask": pb_mask}
+
+      # protocol specific template injection
+      for k, v in template_feats.items():
+        if self.split_templates:
+          for ith, iclique in enumerate(self.cliques):
+            for ichain in iclique:
+              v_set = v[bounds[ichain]:bounds[ichain + 1]]
+              inputs[k] = inputs[k].at[ith, bounds[ichain]:bounds[ichain + 1]].set(v_set)
+        else:
+          inputs[k] = inputs[k].at[0].set(v)
+          
+        if k == "template_all_atom_masks" and self._args["rm_template_seq"]:
+          inputs[k] = inputs[k].at[:,:,5:].set(0)
+
+      # dropout template input features
+      n = self._target_len if self.protocol == "binder" else 0
+      pos_mask = jax.random.bernoulli(key, 1-opt["template"]["dropout"],(L,))
+      inputs["template_all_atom_mask"] = inputs["template_all_atom_mask"].at[:,n:].multiply(pos_mask[n:,None])
+      inputs["template_pseudo_beta_mask"] = inputs["template_pseudo_beta_mask"].at[:,n:].multiply(pos_mask[n:])
+
   def _update_template_complex(self, inputs, atom_position, atom_mask):
     '''update the generated complex structure as the last template'''
+
     pb, pb_mask = model.modules.pseudo_beta_fn(self._wt_aatype,
                                                atom_position,
                                                atom_mask)
-    inputs["template_all_atom_positions"] = inputs["template_all_atom_positions"].at[-1].set(atom_position)
-    inputs["template_all_atom_mask"] = inputs["template_all_atom_mask"].at[-1].set(atom_mask)
-    inputs["template_pseudo_beta"] = inputs["template_pseudo_beta"].at[-1].set(pb)
-    inputs["template_pseudo_beta_mask"] = inputs["template_pseudo_beta_mask"].at[-1].set(pb_mask)
-    if not self._args["rm_template_seq"]:
-      inputs["template_all_atom_mask"] = inputs["template_all_atom_mask"].at[:,:,5:].set(0)
+    if self.use_dgram:
+      template_dgram = model.modules.dgram_from_positions(pb, **self._runner.config.model.embeddings_and_evoformer.template.dgram_features)
+      inputs['template_dgram'] = inputs['template_dgram'].at[-1].set(template_dgram)
+      inputs['template_mask_2d'] = inputs['template_mask_2d'].at[-1].set(jnp.ones_like(inputs['template_mask_2d'][0]))
     else:
-      inputs["template_aatype"] = inputs["template_aatype"].at[-1].set(self._wt_aatype)
+      inputs["template_pseudo_beta"] = inputs["template_pseudo_beta"].at[-1].set(pb)
+      inputs["template_pseudo_beta_mask"] = inputs["template_pseudo_beta_mask"].at[-1].set(pb_mask)
+
+    inputs['template_mask'] = inputs['template_mask'].at[-1].set(1)
 
 
 def update_seq(seq, inputs, seq_1hot=None, seq_pssm=None, msa_input=None):

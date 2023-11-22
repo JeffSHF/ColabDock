@@ -32,6 +32,7 @@ class _dock:
                              use_initial=self.use_initial,
                              msas=self.msas,
                              split_templates=self.split_templates,
+                             use_dgram=self.use_dgram,
                              rm_template_seq=self.rm_template_seq)
         af_model.gen_inputs = []
         af_model.gen_outputs = []
