@@ -1608,7 +1608,7 @@ class SingleTemplateEmbedding(hk.Module):
 
     if "template_dgram" in batch:
       template_dgram = batch["template_dgram"]
-      template_mask_2d = batch["template_dgram"].sum(-1)
+      template_mask_2d = batch["template_mask_2d"]
 
     else:
       template_mask = batch['template_pseudo_beta_mask']

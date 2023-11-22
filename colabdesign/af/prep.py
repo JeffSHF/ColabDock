@@ -11,7 +11,6 @@ from colabdesign.af.inputs import update_aatype
 from colabdesign.af.utils import read_msa
 
 from colabdesign.shared.protein import _np_get_cb, pdb_to_string
-from colabdesign.shared.prep import prep_pos
 from colabdesign.shared.utils import copy_dict
 from colabdesign.shared.model import order_aa
 
@@ -24,13 +23,14 @@ idx_to_resname = dict((v,k) for k,v in resname_to_idx.items())
 class _af_prep:
   # prep functions specific to protocol
   def _prep_dock(self, rest_set, template, fixed_chains=None, use_initial=True, msas=None,
-                 copies=1, repeat=False, block_diag=False, split_templates=True,
-                 rm_template_seq=True, **kwargs):
+                 copies=1, repeat=False, block_diag=False, split_templates=False,
+                 use_dgram=True, rm_template_seq=True, **kwargs):
     '''prep inputs for docking'''
     assert not (template is None and msas is None)
 
     self.rest_set = rest_set
     self.split_templates = split_templates
+    self.use_dgram = use_dgram
     self._args["rm_template_seq"] = rm_template_seq
     
     # block_diag the msa features
@@ -54,6 +54,23 @@ class _af_prep:
     self._wt_aatype = self._batch["aatype"]
     boundaries = [0] + list(np.cumsum(self.lens))
 
+    # msa related
+    wt_seq = ''.join([residue_constants.restypes[iaa] for iaa in self._wt_aatype])
+    if msas is not None:
+      self._args["use_msa"] = True
+      input_msa, input_dlm = read_msa(msas)
+      assert len(input_msa) >= 1
+      assert len(input_msa[0]) == self._len
+      num_msa = min(len(input_msa), self.opt['num_msa'])
+      input_msa, input_dlm = input_msa[:num_msa], input_dlm[:num_msa]
+      if wt_seq != input_msa[0]:
+        input_msa = [wt_seq] + input_msa[:-1]
+        input_dlm = [[0] * self._len] + input_dlm[:-1]
+    else:
+      input_msa = [wt_seq]
+      input_dlm = [[0] * self._len]
+      num_msa = 1
+
     # process fixed_chains
     self.fixed_chains = fixed_chains
     if self.fixed_chains is not None:
@@ -72,26 +89,6 @@ class _af_prep:
     else:
       cliques = [[i] for i in range(len(chains))]
     self.cliques = cliques
-    
-    # template distance matrix
-    x_beta, _ = model.modules.pseudo_beta_fn(aatype=pdb['batch']['aatype'],
-                                              all_atom_positions=pdb['batch']["all_atom_positions"],
-                                              all_atom_mask=pdb['batch']["all_atom_mask"])
-    
-    dm = np.sqrt(np.square(x_beta[:,None] - x_beta[None,:]).sum(-1))
-    dm_mask = np.where(dm < 22, 1, 0)
-    
-    # mask_dist
-    mask = np.zeros([self._len, self._len], dtype=np.float32)
-    for iclique in cliques:
-      for ichain in iclique:
-        istart, istop = boundaries[ichain], boundaries[ichain+1]
-        for jchain in iclique:
-          jstart, jstop = boundaries[jchain], boundaries[jchain+1]
-          mask[istart:istop, jstart:jstop] = 1
-    mask += mask.T
-    mask = np.where(mask == 0, 0, 1)
-    self._batch['mask_d'] = jnp.array(mask * dm_mask)
 
     # generate initial position
     if use_initial:
@@ -149,47 +146,63 @@ class _af_prep:
         pdb_initial.append(pdb_chains[ind])
       pdb_initial = np.concatenate(pdb_initial, 0)
 
-    num_templates = len(cliques) if split_templates else 1
+    num_templates = len(cliques) if split_templates and not use_dgram else 1
     # add another zero template to avoid extra compile
     num_templates = num_templates + 1
-    
-    # msa related
-    wt_seq = ''.join([residue_constants.restypes[iaa] for iaa in self._wt_aatype])
-    if msas is not None:
-      self._args["use_msa"] = True
-      input_msa, input_dlm = read_msa(msas)
-      assert len(input_msa) >= 1
-      assert len(input_msa[0]) == self._len
-      num_msa = min(len(input_msa), self.opt['num_msa'])
-      input_msa, input_dlm = input_msa[:num_msa], input_dlm[:num_msa]
-      if wt_seq != input_msa[0]:
-        input_msa = [wt_seq] + input_msa[:-1]
-        input_dlm = [[0] * self._len] + input_dlm[:-1]
-    else:
-      input_msa = [wt_seq]
-      input_dlm = [[0] * self._len]
-      num_msa = 1
-
-    # make config for msa generation
-    cfg_common = self._runner.config.data.common
-    cfg_common.max_extra_msa = 0
-    cfg_common.num_recycle = 0
-    self._runner.config.data.eval.max_msa_clusters = num_msa
-
-    feature_msa = {**pipeline.make_sequence_features(sequence=wt_seq, description="none", num_res=self._len),
-                   **pipeline.make_msa_features(msas=[input_msa], deletion_matrices=[input_dlm])}
-    self.feature_msa = self._runner.process_features(feature_msa, random_seed=0)
-    self.feature_msa = jax.tree_map(lambda x:jnp.array(x), self.feature_msa)
-
     self._inputs = prep_input_features(L=self._len, N=num_msa, T=num_templates, eN=1)
     self._inputs = jax.tree_map(lambda x:jnp.array(x), self._inputs)
 
     # input generated initial position
-    if use_initial:
-      L = self._inputs["residue_index"].shape[-1]
-      self._inputs["prev"] = {'prev_msa_first_row': np.zeros([L,256]),
-                              'prev_pair': np.zeros([L,L,128]),
-                              'prev_pos': pdb_initial}
+    L = self._inputs["residue_index"].shape[-1]
+    if not use_initial:
+      pdb_initial = np.zeros([L,37,3])
+    self._inputs["prev"] = {'prev_msa_first_row': np.zeros([L,256]),
+                            'prev_pair': np.zeros([L,L,128]),
+                            'prev_pos': pdb_initial}
+
+    # template distance matrix
+    x_beta, _ = model.modules.pseudo_beta_fn(aatype=pdb['batch']['aatype'],
+                                             all_atom_positions=pdb['batch']["all_atom_positions"],
+                                             all_atom_mask=pdb['batch']["all_atom_mask"])
+
+    dm = np.sqrt(np.square(x_beta[:,None] - x_beta[None,:]).sum(-1))
+    dm_mask = np.where(dm < 22, 1, 0)
+    
+    # mask_dist
+    mask = np.zeros([self._len, self._len], dtype=np.float32)
+    for iclique in cliques:
+      for ichain in iclique:
+        istart, istop = boundaries[ichain], boundaries[ichain+1]
+        for jchain in iclique:
+          jstart, jstop = boundaries[jchain], boundaries[jchain+1]
+          mask[istart:istop, jstart:jstop] = 1
+    mask += mask.T
+    mask = np.where(mask == 0, 0., 1.)
+    self._batch['mask_d'] = jnp.array(mask * dm_mask)
+    self._batch['mask_dgram'] = mask
+
+    # update template features
+    if self._args["use_templates"]:
+      self._update_template(self._inputs, self.opt, self.key())
+
+    # template_mask = np.zeros([num_templates, self._len, self._len])
+    # if split_templates:
+    #   for ith, iclique in enumerate(self.cliques):
+    #     i_mask = np.zeros([self._len])
+    #     for ichain in iclique:
+    #       i_mask[boundaries[ichain]:boundaries[ichain+1]] = 1
+    #     template_mask[ith] = i_mask[:, None] * i_mask[None, :]
+    #   # make sure all the attentions can focus on at least one pixel
+    #   remain_mask = 1. - template_mask.sum(0)
+    #   template_mask[0] += remain_mask
+    # else:
+    #   template_mask[0] = 1
+    template_mask = np.ones(num_templates)
+    template_mask[-1] = 0
+    
+    self._inputs["template_mask"] = jnp.array(template_mask)
+    self._inputs["mask_template_interchain"] = False
+    self._inputs["use_dropout"] = False
 
     # update residue index
     if len(self.lens) > 1:
@@ -201,17 +214,19 @@ class _af_prep:
     else:
       raise Exception('current is only suitable for complex!')
     
-    # move from model._get_model to here
     # update amino acid sidechain identity
-    # aatype_gen = jax.nn.one_hot(seq["pseudo"][0].argmax(-1),21)
     update_aatype(self._wt_aatype, self._inputs)
 
-    # update template features
-    if self._args["use_templates"]:
-      self._update_template(self._inputs, self.opt, self.key())
-    
-    self._inputs["mask_template_interchain"] = False
-    self._inputs["use_dropout"] = True
+    # make config for msa generation
+    cfg_common = self._runner.config.data.common
+    cfg_common.max_extra_msa = 0
+    cfg_common.num_recycle = 0
+    self._runner.config.data.eval.max_msa_clusters = num_msa
+
+    feature_msa = {**pipeline.make_sequence_features(sequence=wt_seq, description="none", num_res=self._len),
+                   **pipeline.make_msa_features(msas=[input_msa], deletion_matrices=[input_dlm])}
+    self.feature_msa = self._runner.process_features(feature_msa, random_seed=0)
+    self.feature_msa = jax.tree_map(lambda x:jnp.array(x), self.feature_msa)
 
     self._opt = copy_dict(self.opt)
     self.restart(**kwargs)
