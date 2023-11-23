@@ -37,9 +37,7 @@ class _dock:
         af_model.gen_inputs = []
         af_model.gen_outputs = []
 
-        seq_wt = self.seq_wt if self.use_initial else None
-        af_model.restart(seq=seq_wt)
-
+        af_model.restart(seq=af_model.seq_init)
         af_model.set_weights(plddt=0.1, i_pae=0.1, dgram_cce=1.5, 
                              rest_1v1=self.w_res, rest_1vN=self.w_res,
                              rest_MvN=self.w_res, rest_non=self.w_non)

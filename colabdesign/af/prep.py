@@ -2,6 +2,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from scipy.spatial.transform import Rotation as R
+from Bio import pairwise2
 
 from colabdesign.af.alphafold.data import pipeline, prep_inputs
 from colabdesign.af.alphafold.common import protein, residue_constants
@@ -92,6 +93,43 @@ class _af_prep:
       cliques = [[i] for i in range(len(chains))]
     self.cliques = cliques
 
+    # seq init
+    seqs = []
+    for ind in range(len(chains)):
+      start, stop = boundaries[ind], boundaries[ind+1]
+      seqs.append(wt_seq[start:stop])
+
+    sim_mat = np.ones([len(chains), len(chains)])
+    for ith in range(len(chains)):
+      ilen = len(seqs[ith])
+      for jth in range(ith+1, len(chains)):
+        jlen = len(seqs[jth])
+        if min(ilen, jlen) / max(ilen, jlen) > 0.8:
+          alignments = pairwise2.align.globalxx(seqs[ith], seqs[jth])
+          if cal_seqid(alignments[0]) > 0.8:
+            sim_mat[ith, jth] = 0
+    
+    del_idx = []
+    for ith in range(1, len(chains)):
+      if not (all(sim_mat[ith]) and all(sim_mat[:,ith])):
+        del_idx.append(ith)
+        sim_mat[ith] = 1
+        sim_mat[:, ith] = 1
+    
+    init_mask = np.ones(self._len)
+    for ind in del_idx:
+      start, stop = boundaries[ind], boundaries[ind+1]
+      init_mask[start:stop] = 0
+
+    noise_mask = np.random.rand(self._len)
+    noise_mask = np.where(noise_mask > 0.7, 1, 0)
+    init_mask += noise_mask*(1. - init_mask)
+    
+    seq_init = np.eye(20)[self._wt_aatype] * init_mask[..., None]
+    seq_init += np.random.normal(size=(self._len, 20)) * 0.1 * (1. - init_mask[..., None])
+
+    self.seq_init = seq_init
+
     # generate initial position
     if use_initial:
       assert len(cliques) <= 8
@@ -103,7 +141,7 @@ class _af_prep:
 
       # this is used only in development!
       pdb_chains = {}
-      for ind in range(len(self.lens)):
+      for ind in range(len(chains)):
         start, stop = boundaries[ind], boundaries[ind+1]
         ipdb_pos = pdb_pos[start:stop]
         pdb_chains[ind] = ipdb_pos
@@ -418,3 +456,13 @@ def prep_input_features(L, N=1, T=1, eN=1):
             'all_atom_positions': np.zeros((N,37,3))}
   return inputs
 
+def cal_seqid(alignment):
+  aliA = alignment.seqA
+  seqA = ''.join([iaa for iaa in aliA if iaa != '-'])
+  aliB = alignment.seqB
+  seqB = ''.join([iaa for iaa in aliB if iaa != '-'])
+  idx = [ind for ind in range(len(aliA)) if aliA[ind] != '-']
+  aliA = ''.join([aliA[ind] for ind in idx])
+  aliB = ''.join([aliB[ind] for ind in idx])
+  seqid = sum([1 for ith in range(len(aliA)) if aliA[ith] == aliB[ith]])
+  return seqid / min(len(seqA), len(seqB))
