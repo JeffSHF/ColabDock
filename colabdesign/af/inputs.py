@@ -67,7 +67,7 @@ class _af_inputs:
       inputs['template_all_atom_mask'] = inputs['template_all_atom_mask'].at[0].set(self._batch["all_atom_mask"])
 
       if self._args["rm_template_seq"]:
-        inputs['template_all_atom_masks'] = inputs['template_all_atom_masks'].at[:,:,5:].set(0)
+        inputs['template_all_atom_mask'] = inputs['template_all_atom_mask'].at[:,:,5:].set(0)
     else:
       # define template features
       template_feats = {"template_aatype": template_aatype,
