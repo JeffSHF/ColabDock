@@ -10,22 +10,26 @@ config = {
     # template and native structure
     ###########################################################################################################
     # the structure of proteins you want to dock
-    'template': './protein/4INS4/PDB/template.pdb',
+    'template': './protein/4HFF/PDB/4HFF.pdb',
+    # 'template': './protein/4INS4/PDB/template.pdb',
 
     # optional, the native structure of the complex, used for calculating the RMSD
     # if you do not have native structure, set it to None.
-    'native': './protein/4INS4/PDB/native.pdb',
+    'native': './protein/4HFF/PDB/4HFF.pdb',
+    # 'native': './protein/4INS4/PDB/native.pdb',
 
     # docking chains
     # This determines the order that the chain sequences are concatenated to form the complex sequence.
-    'chains': 'A,B,C,D',
+    'chains': 'A,B',
+    # 'chains': 'A,B,C,D',
 
     # input the chainIDs if you want the relative position of chains is fixed as in the provided template
     # otherwise, set to None
     # example:
     #     'fixed_chains': ['A,B', 'C,D']
     #     the relative position of chain A and B is fixed, also that of chain C and D.
-    'fixed_chains': ['A,B', 'C,D'],
+    'fixed_chains': None,
+    # 'fixed_chains': ['A,B', 'C,D'],
     
     ###########################################################################################################
     # experimental restraints
@@ -47,7 +51,8 @@ config = {
     # example:
     #     'rest_1v1': [[78,198],[20,50]]
     #     The distance between 78th and 198th residue is below a given threshold, as well as the distance between 20th and 50th residue.
-    'rest_1v1': None,
+    'rest_1v1': [79,199],
+    # 'rest_1v1': None,
 
     # 1vN restraints
     # description:
@@ -72,7 +77,8 @@ config = {
     #                  [120, list(range(160, 170))],
     #                  2]
     #     2 of the 3 given 1vN restraints should be satisfied.
-    'rest_MvN': joblib.load('./protein/4INS4/rest_MvN.pkl'),
+    'rest_MvN': None,
+    # 'rest_MvN': joblib.load('./protein/4INS4/rest_MvN.pkl'),
     
     # the threshold of the repulsive restraints
     # Change to other values if you know the threshold of the restraints you provide.
@@ -96,23 +102,26 @@ config = {
     # if in segment based optimization, set to the length of the segment, for example 200.
     # segment based optimization can save GPU memory, but may lead to suboptimal performance.
     # if not, set to None
-    'crop_len': None,
+    'crop_len': 200,
+    # 'crop_len': None,
 
     # the number of rounds to perform
     # large rounds can achive better performance but lead to longer time.
-    'rounds': 2,
+    'rounds': 1,
 
     # the number of backpropogations in each round
     # if in segment based optimization, set to larger value, for example 150.
     # if not, usually it will converge within 50 steps
-    'steps': 50,
+    'steps': 100,
+    # 'steps': 50,
 
     # Save one conformtion in every save_every_n_step step.
     # useful in segment based optimization, since the number of steps is larger
     # and saving conformations in every step will take too much time.
     # if in segment based optimization, set to larger value, for example 3.
     # if not, set to 1.
-    'save_every_n_step': 1,
+    'save_every_n_step': 10,
+    # 'save_every_n_step': 1,
 
     ###########################################################################################################
     # AF2 model

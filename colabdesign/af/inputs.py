@@ -5,6 +5,7 @@ import numpy as np
 from colabdesign.shared.model import soft_seq
 from colabdesign.af.alphafold.common import residue_constants
 from colabdesign.af.alphafold.model import model
+from colabdesign.af.alphafold.model.config import CONFIG
 
 ############################################################################
 # AF_INPUTS - functions for modifying inputs before passing to alphafold
@@ -172,8 +173,7 @@ def crop_feat(feat, pos, model_runner, add_batch=True):
     return None
 
   else:
-    cfg = model_runner.config
-    shapes = cfg.data.eval.feat
+    shapes = CONFIG.data.eval.feat
     NUM_RES = "num residues placeholder"
     idx = {k:find(v,NUM_RES) for k,v in shapes.items()}
 
