@@ -10,7 +10,8 @@ class _dock:
                                           crop_len=self.crop_len,
                                           prob_rest=self.prob_rest,
                                           bfloat=self.bfloat,
-                                          data_dir=self.data_dir)
+                                          data_dir=self.data_dir,
+                                          use_multimer=self.use_multimer)
         self.af_model.asym_id = self.asym_id
         if self.crop_len is not None:
             self.af_model.sample_p = self.sample_p
@@ -33,7 +34,8 @@ class _dock:
                              msas=self.msas,
                              split_templates=self.split_templates,
                              use_dgram=self.use_dgram,
-                             rm_template_seq=self.rm_template_seq)
+                             rm_template_seq=self.rm_template_seq,
+                             use_multimer=self.use_multimer)
         af_model.gen_inputs = []
         af_model.gen_outputs = []
 

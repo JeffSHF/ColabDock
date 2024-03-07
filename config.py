@@ -132,6 +132,9 @@ config = {
     # AF2 weights dir
     'data_dir': '/data/dell/alphafold',
 
+    # use AF2 or AF2-Multimer
+    'use_multimer': False,
+
     # whether use AF2 in bfloat
     'bfloat': True,
 }

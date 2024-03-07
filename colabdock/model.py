@@ -25,7 +25,8 @@ class ColabDock(_dock, _rank, _rest):
                  bfloat=True,
                  res_thres=8.0,
                  non_thres=12.0,
-                 save_every_n_step=1) -> None:
+                 save_every_n_step=1,
+                 use_multimer=False) -> None:
         self.template = template
         self.structure_gt = structure_gt
         self.fixed_chains = fixed_chains
@@ -40,6 +41,7 @@ class ColabDock(_dock, _rank, _rest):
         self.crop_len = crop_len
         self.prob_rest = prob_rest
         self.bfloat = bfloat
+        self.use_multimer=use_multimer
 
         self.save_path = save_path
         self.data_dir = data_dir
