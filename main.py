@@ -110,6 +110,7 @@ if __name__ == '__main__':
     save_every_n_step = config.save_every_n_step
     data_dir = config.data_dir
     bfloat = config.bfloat
+    use_multimer = config.use_multimer
 
     ######################################################################################
     # print setting
@@ -140,7 +141,8 @@ if __name__ == '__main__':
                            bfloat=bfloat,
                            res_thres=res_thres,
                            non_thres=non_thres,
-                           save_every_n_step=save_every_n_step)
+                           save_every_n_step=save_every_n_step,
+                           use_multimer=use_multimer)
     dock_model.setup()
     if dock_model.crop_len is not None:
         print_str += 'Colabdock will work in segment based mode.'

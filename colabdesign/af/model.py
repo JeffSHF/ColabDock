@@ -25,8 +25,8 @@ class mk_af_model(design_model, _af_inputs, _af_loss, _af_prep, _af_design, _af_
                use_templates=False, use_msa=False, best_metric="loss",
                crop_len=None, crop=False, prob_rest=0.5,
                subbatch_size=None, debug=False,
-               use_alphafold=True, use_openfold=False, bfloat=True,
-               loss_callback=None, data_dir="."):
+               use_alphafold=True, use_openfold=False, use_multimer=False,
+               bfloat=True, loss_callback=None, data_dir="."):
     
     # fixbb: fix backbone design
     # hallucination: hallucinate protein structure based on nothing
@@ -52,6 +52,7 @@ class mk_af_model(design_model, _af_inputs, _af_loss, _af_prep, _af_design, _af_
                   "best_metric":best_metric,
                   'use_alphafold':use_alphafold,
                   'use_openfold':use_openfold,
+                  'use_multimer':use_multimer,
                   "crop_len":crop_len,
                   "crop":crop,
                   "prob_rest":prob_rest,
@@ -76,12 +77,13 @@ class mk_af_model(design_model, _af_inputs, _af_loss, _af_prep, _af_design, _af_
     #############################
     # configure AlphaFold
     #############################
+    suffix = 'multimer_v3' if use_multimer else 'ptm'
     # decide which config to use
     if use_templates:
-      model_name = "model_1_ptm"
+      model_name = f"model_1_{suffix}"
       self.opt["models"] = min(num_models, 2)
     else:
-      model_name = "model_3_ptm"
+      model_name = f"model_3_{suffix}"
     
     # generator config
     cfg = config.model_config(model_name)
@@ -95,16 +97,16 @@ class mk_af_model(design_model, _af_inputs, _af_loss, _af_prep, _af_design, _af_
     cfg.model.num_recycle = num_recycles
 
     # initialize runner
-    self._runner = model.RunModel(cfg, recycle_mode=recycle_mode)
+    self._runner = model.RunModel(cfg,
+                                  recycle_mode=recycle_mode,
+                                  use_multimer=use_multimer)
 
     # load model_params
     model_names = []
     if use_templates:
-      model_names += [f"model_{k}_ptm" for k in [1,2]]
-      # model_names += [f"openfold_model_ptm_{k}" for k in [1,2]]    
+      model_names += [f"model_{k}_{suffix}" for k in [1,2]]
     else:
-      model_names += [f"model_{k}_ptm" for k in [1,2,3,4,5]]
-      # model_names += [f"openfold_model_ptm_{k}" for k in [1,2]] + ["openfold_model_no_templ_ptm_1"]
+      model_names += [f"model_{k}_{suffix}" for k in [1,2,3,4,5]]
 
     self._model_params, self._model_names = [],[]
     for model_name in model_names:
@@ -142,7 +144,7 @@ class mk_af_model(design_model, _af_inputs, _af_loss, _af_prep, _af_design, _af_
       i_outputs = self._runner.apply(self._model_params[0], self.key(), self._inputs)
       i_aux = {"atom_positions":i_outputs["structure_module"]["final_atom_positions"],
                "atom_mask":i_outputs["structure_module"]["final_atom_mask"],                  
-               "residue_index":self._inputs["residue_index"], "aatype":self._inputs["aatype"],
+               "residue_index":self.residue_index, "aatype":self._inputs["aatype"],
                "plddt":get_plddt(i_outputs), "pae":get_pae(i_outputs), "ptm":get_ptm(i_outputs)}
       i_aux = jax.tree_util.tree_map(np.asarray, i_aux)
       save_path = root_path + f'_{i+1}.pdb'
@@ -175,7 +177,7 @@ class mk_af_model(design_model, _af_inputs, _af_loss, _af_prep, _af_design, _af_
       idis_outputs = self._runner.apply(self._model_params[0], self.key(), self._inputs)
       i_aux = {"atom_positions":idis_outputs["structure_module"]["final_atom_positions"],
                "atom_mask":idis_outputs["structure_module"]["final_atom_mask"],
-               "residue_index":self._inputs["residue_index"], "aatype":self._inputs["aatype"],
+               "residue_index":self.residue_index, "aatype":self._inputs["aatype"],
                "plddt":get_plddt(idis_outputs), "pae":get_pae(idis_outputs),"ptm": get_ptm(idis_outputs)}
       i_aux = jax.tree_util.tree_map(np.asarray, i_aux)
       save_path = root_path + f'_{i+1}.pdb'

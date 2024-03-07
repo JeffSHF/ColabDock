@@ -347,6 +347,7 @@ class EmbeddingsAndEvoformer(hk.Module):
         }
         if "template_dgram" in batch:
           template_batch["template_dgram"] = batch["template_dgram"]
+          template_batch["template_mask_2d"] = batch["template_mask_2d"]
 
         # Construct a mask such that only intra-chain template features are
         # computed, since all templates are for each chain individually.
@@ -567,7 +568,9 @@ class SingleTemplateEmbedding(hk.Module):
 
       if "template_dgram" in template_batch:
         template_dgram = template_batch["template_dgram"].astype(dtype)
-        template_dgram *= multichain_mask_2d[...,None]
+        template_mask_2d = template_batch["template_mask_2d"].astype(dtype)
+        template_mask_2d *= multichain_mask_2d
+        template_dgram *= template_mask_2d[...,None]
         pseudo_beta_mask_2d = template_dgram.sum(-1)
       
       else:

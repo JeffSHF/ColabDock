@@ -120,6 +120,9 @@ config = {
     # AF2 weights dir
     'data_dir': './params',
 
+    # use AF2 or AF2-Multimer
+    'use_multimer': True,
+
     # whether use AF2 in bfloat
     'bfloat': True,
 }

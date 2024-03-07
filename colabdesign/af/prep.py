@@ -25,7 +25,7 @@ class _af_prep:
   # prep functions specific to protocol
   def _prep_dock(self, rest_set, template, fixed_chains=None, use_initial=True, msas=None,
                  copies=1, repeat=False, block_diag=False, split_templates=False,
-                 use_dgram=True, rm_template_seq=True, **kwargs):
+                 use_dgram=True, rm_template_seq=True, use_multimer=False, **kwargs):
     '''prep inputs for docking'''
     assert not (template is None and msas is None)
 
@@ -68,8 +68,6 @@ class _af_prep:
         input_msa = [wt_seq] + input_msa[:-1]
         input_dlm = [[0] * self._len] + input_dlm[:-1]
     else:
-      input_msa = [wt_seq]
-      input_dlm = [[0] * self._len]
       num_msa = 1
 
     # process fixed_chains
@@ -236,23 +234,50 @@ class _af_prep:
       residue_index = np.array(self._inputs['residue_index'])
       for ith in range(len(boundaries)-1):
         residue_index[boundaries[ith]:boundaries[ith+1]] += 50*ith
-      self._inputs['residue_index'] = jnp.array(residue_index)
+      if not self._args['use_multimer']:
+        self._inputs['residue_index'] = jnp.array(residue_index)
+      self.residue_index = residue_index
     else:
       raise Exception('current is only suitable for complex!')
+
+    # update asym_id, sym_id, entity_id
+    if self._args['use_multimer']:
+      asym_id = np.zeros(self._len)
+      for ith in range(len(boundaries)-1):
+        start, stop = boundaries[ith], boundaries[ith+1]
+        asym_id[start:stop] = ith
+      
+      entity_id = np.zeros(self._len)
+      sym_id = np.zeros(self._len)
+      unique_seqs = list(set(seqs))
+      for ith, iseq in enumerate(unique_seqs):
+        idx = [jth for jth, jseq in enumerate(seqs) if jseq==iseq]
+        for jth, ind in enumerate(idx):
+          start, stop = boundaries[ind], boundaries[ind+1]
+          sym_id[start:stop] = jth
+          entity_id[start:stop] = ith
+      self._inputs['asym_id'] = jnp.array(asym_id)
+      self._inputs['entity_id'] = jnp.array(entity_id)
+      self._inputs['sym_id'] = jnp.array(sym_id)
     
     # update amino acid sidechain identity
     update_aatype(self._wt_aatype, self._inputs)
 
     # make config for msa generation
-    cfg_common = self._runner.config.data.common
-    cfg_common.max_extra_msa = 0
-    cfg_common.num_recycle = 0
-    self._runner.config.data.eval.max_msa_clusters = num_msa
+    if use_multimer:
+      cfg_common = self._runner.config.model
+      cfg_common.num_recycle = 0
+    else:
+      cfg_common = self._runner.config.data.common
+      cfg_common.max_extra_msa = 0
+      cfg_common.num_recycle = 0
+      self._runner.config.data.eval.max_msa_clusters = num_msa
 
-    feature_msa = {**pipeline.make_sequence_features(sequence=wt_seq, description="none", num_res=self._len),
-                   **pipeline.make_msa_features(msas=[input_msa], deletion_matrices=[input_dlm])}
-    self.feature_msa = self._runner.process_features(feature_msa, random_seed=0)
-    self.feature_msa = jax.tree_map(lambda x:jnp.array(x), self.feature_msa)
+    if self._args["use_msa"]:
+      feature_msa = {**pipeline.make_sequence_features(sequence=wt_seq, description="none", num_res=self._len),
+                     **pipeline.make_msa_features(msas=[input_msa], deletion_matrices=[input_dlm])}
+      self.feature_msa = self._runner.process_features(feature_msa, random_seed=0)
+      self.feature_msa = jax.tree_map(lambda x:jnp.array(x), self.feature_msa)
 
     self._opt = copy_dict(self.opt)
     self.restart(**kwargs)
