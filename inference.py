@@ -13,17 +13,11 @@ from colabdesign.shared.utils import Key
 
 class AF2_infer():
     def __init__(self,
-                 template_path,
-                 chains,
-                 data_dir='./params') -> None:
-        self.template_path = template_path
-        self.chains = chains
+                 num_recycles=3,
+                 subbatch_size=None,
+                 bfloat=True,
+                 data_dir='./params'):
         self.data_dir = data_dir
-    
-    def set_up(self,
-               subbatch_size=None,
-               bfloat=True,
-               num_recycles=3):
         cfg = config.model_config('model_1_ptm')
         cfg.model.global_config.use_remat = True  
         cfg.model.global_config.subbatch_size = subbatch_size
@@ -43,6 +37,12 @@ class AF2_infer():
                 self._model_params.append(params)
                 self._model_names.append(model_name)
     
+    def setup(self,
+              template_path,
+              chains) -> None:
+        self.template_path = template_path
+        self.chains = chains
+    
     def update_inputs(self,
                       target_seq='wt',
                       msa_seq='wt',
@@ -60,17 +60,15 @@ class AF2_infer():
 
         chains = [c.strip() for c in self.chains.split(",")]
         self.lens = [(tmp_obj["idx"]["chain"] == c).sum() for c in chains]
-        self._len = sum(self.lens)
 
         # update seq related
         # target seq
-        seq_target = convert_seq(target_seq, seq_wt, ''.join(residue_constants.restypes_with_x + ['-']))
+        seq_target = convert_seq(target_seq, seq_wt)
         seq_target = jax.nn.one_hot(seq_target, 22)[None]
         self._update_target_seq(seq_target)
 
         # msa seq
-        hhblits_mapping = ''.join([residue_constants.ID_TO_HHBLITS_AA[i] for i in range(22)])
-        seq_msa = convert_seq(msa_seq, seq_wt, hhblits_mapping)
+        seq_msa = convert_seq(msa_seq, seq_wt)
         seq_msa = jax.nn.one_hot(seq_msa, 22)[None]
         self._update_msa_seq(seq_msa)
 
@@ -84,7 +82,7 @@ class AF2_infer():
                                 'prev_pair': np.zeros([self.L, self.L, 128]),
                                 'prev_pos': pdb_pos}
         # template seq
-        seq_tmp = convert_seq(template_seq, seq_wt, hhblits_mapping)
+        seq_tmp = convert_seq(template_seq, seq_wt)
         self._update_template(tmp_obj, seq_tmp)
 
         # update residue idx
@@ -116,7 +114,7 @@ class AF2_infer():
                                                    batch["all_atom_mask"])
         template_dgram = model.modules.dgram_from_positions(pb, **self._runner.config.model.embeddings_and_evoformer.template.dgram_features)
         self.inputs['template_dgram'] = template_dgram[None]
-        self.inputs['template_mask_2d'] = jnp.ones([self._len, self._len])[None]
+        self.inputs['template_mask_2d'] = jnp.ones([self.L, self.L])[None]
         self.inputs['template_aatype'] = template_aatype[None]
         self.inputs['template_all_atom_positions'] = self.inputs['template_all_atom_positions'].at[0].set(batch["all_atom_positions"])
         self.inputs['template_all_atom_mask'] = self.inputs['template_all_atom_mask'].at[0].set(batch["all_atom_mask"])
@@ -164,7 +162,8 @@ class AF2_infer():
         aux = jax.tree_util.tree_map(np.asarray, aux)
         save_pdb_from_aux(aux, save_path)
 
-def convert_seq(seq, wt, mapping):
+def convert_seq(seq, wt,
+                mapping=residue_constants.restypes_with_x + ['-']):
     # wt(str)
     # map
     if seq == 'wt':
@@ -179,9 +178,9 @@ def convert_seq(seq, wt, mapping):
 
 
 if __name__ == '__main__':
-    AF_model = AF2_infer(template_path='./protein/1AK2/1AK2_A_1.pdb',
-                         chains = 'A')
-    AF_model.set_up(bfloat=False)
+    AF_model = AF2_infer(bfloat=False)
+    AF_model.setup(template_path='./protein/4HFF/PDB/4HFF.pdb',
+                   chains='A,B')
     AF_model.update_inputs(target_seq='X',
                            msa_seq='X',
                            template_seq='X',
