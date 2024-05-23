@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import joblib
 
 
 def prep_path(save_path):
@@ -78,9 +79,7 @@ def inflate(mask, crop_len):
     elif mask.sum() < crop_len:
         break_flag = 0
         segs = get_segs(mask)
-        seg_lens = [iseg[1] - iseg[0] + 1 for iseg in segs]
-        ave_len = crop_len // len(segs)
-        add_num = [max(ave_len - iseg_len, 0) // 2 for iseg_len in seg_lens]
+        add_num = [max(1, int(crop_len - mask.sum()) // (len(segs) * 2))] * len(segs)
         while True:
             break_flag, mask = expand_segs(segs, mask, add_num)
             add_num = max([1, int((crop_len - mask.sum()) // (len(segs) * 2))])
