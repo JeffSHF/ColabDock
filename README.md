@@ -1,8 +1,13 @@
 # ColabDock
-<b>Inverting AlphaFold2 structure prediction model for protein-protein docking with experimental restraints</b>
+<b>Integrated structure prediction of protein–protein docking with experimental restraints using ColabDock</b>
 
 ![ColabDock](https://github.com/JeffSHF/ColabDock/assets/88184243/62b65508-6bbf-46f5-a4c0-72206b5e09fe)
 ColabDock is a docking framework developed based on [ColabDesign](https://github.com/sokrypton/ColabDesign.git). It is able to incorporate experimental restraints to generate accurate protein complex structure. For details, please refer to the [paper](https://doi.org/10.1101/2023.07.04.547599).
+
+<b>News</b>
+ - <b>July 5, 2024</b>
+   - We are excited to announce that ColabDock has been published on Nature Machine Intelligence :satisfied:! [(Link)](https://www.nature.com/articles/s42256-024-00873-z)
+
 
 Note running ColabDock locally requires GPU. If you do not have one, we suggest using the Colab version.
 <a href="https://colab.research.google.com/github/JeffSHF/ColabDock/blob/dev/ColabDock.ipynb">
