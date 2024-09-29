@@ -50,6 +50,9 @@ Example (which has been tested locally):
 pip install https://storage.googleapis.com/jax-releases/cuda11/jaxlib-0.3.8+cuda11.cudnn805-cp38-none-manylinux2014_x86_64.whl
 # install jax
 pip install jax==0.3.8
+
+# or use conda to install jax(lib)
+conda install jaxlib='0.3.15=*cuda*' jax etils=1.4 cuda-nvcc py3dmol -c conda-forge -c nvidia
 ```
 
 5. Install other dependencies
