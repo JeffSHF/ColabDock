@@ -2,7 +2,7 @@ import os
 import argparse
 from importlib.util import spec_from_file_location, module_from_spec
 import numpy as np
-from colabdock.utils import prep_path
+from colabdock.utils import prep_path, ColabDockRootDir
 from colabdock.model import ColabDock
 
 np.set_printoptions(precision=3)
@@ -10,14 +10,15 @@ np.set_printoptions(precision=3)
 
 os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "False"
 if __name__ == '__main__':
-    _current_cfg_path = os.path.join(os.path.dirname((__file__)), 'config.py')
+    _current_cfg_path = os.path.join(ColabDockRootDir, 'config.py')
     parser = argparse.ArgumentParser(description='Generate complex structure with restraints.')
     parser.add_argument('--config', '-c', type=str, default=_current_cfg_path, help='Path of docking config file.Use `config.py` in root directory of source code as default.')
+    args=parser.parse_args()
     try:
-        spec = spec_from_file_location('config', parser.config)
+        spec = spec_from_file_location('myconfig', args.config)
         config_module = module_from_spec(spec)
         spec.loader.exec_module(config_module)
-        from config_module import config
+        config = config_module.config
     except (ModuleNotFoundError, ImportError):
         print('Given module path is invalid.Use default config.')
         from config import config

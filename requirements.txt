@@ -2,10 +2,13 @@ absl_py==1.2.0
 biopython==1.78
 dm_haiku==0.0.8
 dm_tree==0.1.7
+etils==1.4.1
 joblib==1.2.0
 matplotlib==3.5.2
 ml_collections==0.1.1
 numpy==1.23.1
+pandas==2.0.3
+py3Dmol==2.4.0
 scipy==1.9.1
 tensorflow_cpu==2.7.0
 tqdm==4.64.1

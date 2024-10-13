@@ -52,7 +52,7 @@ pip install https://storage.googleapis.com/jax-releases/cuda11/jaxlib-0.3.8+cuda
 pip install jax==0.3.8
 
 # or use conda to install jax(lib)
-conda install jaxlib='0.3.15=*cuda*' jax etils=1.4 cuda-nvcc py3dmol -c conda-forge -c nvidia
+conda install jaxlib='0.3.15=*cuda*' jax etils=1.4 cuda-nvcc -c conda-forge -c nvidia
 ```
 
 5. Install other dependencies
@@ -82,8 +82,12 @@ After the running, the outputs directory (default is `results`) will contain thr
 
 ### Restraints sampling
 If you want to test ColabDock using a complex with known structure, you can generate 1v1, 1vN, or MvN restraints using the extract_rest.py script. For example, 4INS4 contains 4 protein chains, i.e., A,B,C,D. If you want to sample some 1v1 restraints between chain A and chain D, then run the following command and the program will print the sampled restraints.
+
+If you get initial residue segment ids from papers or other experiments,you can use -i or --init to specify 1v1/repulsive restraint(s) and generate AF2 orders for `config.py`.
+
 ```python
 python extract_rest.py ./protein/4INS4/PDB/native.pdb A,B,C,D A,D 1v1
+# python extract_rest.py ./protein/4INS4/PDB/native.pdb A,B,C,D A,D 1v1 -i 45,12
 ```
 You can also use `python extract_rest.py -h` to get more informations about the input parameters.
 
