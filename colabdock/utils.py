@@ -89,3 +89,6 @@ def inflate(mask, crop_len):
 
         assert mask.sum() == crop_len
     return mask
+
+ColabDockRootDir = os.path.dirname(__file__).rsplit(os.sep,1)[0]
+'''Dynamic absolute root path of ColabDock source code.`main.py` is in this path.'''

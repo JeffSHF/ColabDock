@@ -1,21 +1,22 @@
 import ml_collections
 import joblib
+from colabdock.utils import ColabDockRootDir
 
 
 config = {
     # path where you want to save the results
-    'save_path': './results',
+    'save_path': f'{ColabDockRootDir}/results',
 
     ###########################################################################################################
     # template and native structure
     ###########################################################################################################
     # the structure of proteins you want to dock
-    'template': './protein/4HFF/PDB/4HFF.pdb',
+    'template': f'{ColabDockRootDir}/protein/4HFF/PDB/4HFF.pdb',
     # 'template': './protein/4INS4/PDB/template.pdb',
 
     # optional, the native structure of the complex, used for calculating the RMSD
     # if you do not have native structure, set it to None.
-    'native': './protein/4HFF/PDB/4HFF.pdb',
+    'native': f'{ColabDockRootDir}/protein/4HFF/PDB/4HFF.pdb',
     # 'native': './protein/4INS4/PDB/native.pdb',
 
     # docking chains
@@ -78,7 +79,7 @@ config = {
     #                  2]
     #     2 of the 3 given 1vN restraints should be satisfied.
     'rest_MvN': None,
-    # 'rest_MvN': joblib.load('./protein/4INS4/rest_MvN.pkl'),
+    # 'rest_MvN': joblib.load(f'{ColabDockRootDir}/protein/4INS4/rest_MvN.pkl'),
     
     # the threshold of the repulsive restraints
     # Change to other values if you know the threshold of the restraints you provide.
@@ -127,7 +128,7 @@ config = {
     # AF2 model
     ###########################################################################################################
     # AF2 weights dir
-    'data_dir': './params',
+    'data_dir': f'{ColabDockRootDir}/params',
 
     # use AF2 or AF2-Multimer
     'use_multimer': True,
