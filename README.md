@@ -34,22 +34,29 @@ Note running ColabDock locally requires GPU. If you do not have one, we suggest 
 ```bash
 conda create --name colabdock python=3.8
 ```
+
 2. Clone the repo
 ```bash
 git clone git@github.com:JeffSHF/ColabDock.git
 ```
+
 3. Activate environment
 ```bash
 cd ColabDock && conda activate colabdock
 ```
+
 4. Install jax  
-<b>Please refer to [JAX github](https://github.com/google/jax) page to install package corresponding to your CUDA and cudnn version.</b>  
+   * <b>Please refer to [JAX github](https://github.com/google/jax) page to install package corresponding to your CUDA and cudnn version.</b>  
 Example (which has been tested locally):
 ```bash
 # install jaxlib
 pip install https://storage.googleapis.com/jax-releases/cuda11/jaxlib-0.3.8+cuda11.cudnn805-cp38-none-manylinux2014_x86_64.whl
 # install jax
 pip install jax==0.3.8
+```  
+   * Or you can try conda (tested by [@Regen Tsai](https://github.com/alchemistcai)):
+```bash
+conda install jaxlib='0.3.15=*cuda*' jax cuda-nvcc -c conda-forge -c nvidia
 ```
 
 5. Install other dependencies
@@ -64,6 +71,7 @@ cd params
 wget https://storage.googleapis.com/alphafold/alphafold_params_2022-12-06.tar
 tar -xvf alphafold_params_2022-12-06.tar
 ```
+
 The installation takes ~10 min.
 
 ### Usage
@@ -71,6 +79,10 @@ Before running the code, please set the variables in the config.py file accordin
 The default config.py contains the setting of protein 4INS4.
 ```bash
 conda activate colabdock && python main.py
+```
+Or you can set the path of the configure file you want to use. For example:
+```bash
+conda activate colabdock && python main.py -c ./protein/4HFF/config.py
 ```
 The running time depends on the size of the protein, the round and step numbers. For the default setting, it should take ~10 min.
 

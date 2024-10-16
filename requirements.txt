@@ -11,3 +11,4 @@ tensorflow_cpu==2.7.0
 tqdm==4.64.1
 scikit-learn==1.2.2
 protobuf==3.20.*
+py3Dmol==2.4.0

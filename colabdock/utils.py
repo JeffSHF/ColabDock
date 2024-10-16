@@ -4,24 +4,33 @@ import joblib
 
 
 def prep_path(save_path):
-  if not os.path.exists(f'{save_path}/gen'):
-    os.makedirs(f'{save_path}/gen')
-  if not os.path.exists(f'{save_path}/pred'):
-    os.makedirs(f'{save_path}/pred')
-  if not os.path.exists(f'{save_path}/docked'):
-    os.makedirs(f'{save_path}/docked')
+    gen_path = f'{save_path}/gen'
+    pred_path = f'{save_path}/pred'
+    dock_path = f'{save_path}/docked'
+
+    def check_path(ipath):
+        if not os.path.exists(ipath):
+            os.makedirs(ipath)
+        else:
+            files = os.listdir(ipath)
+            for ifile in files:
+                os.system(f'rm {ipath}/{ifile}')
+    
+    check_path(gen_path)
+    check_path(pred_path)
+    check_path(dock_path)
 
 
 def renum_pdb(inpdb_path, outpdb_path, ind2ID):
-  # delete gap & change chain id
-  # renumber atom id & chain id (todo)
-  with open(inpdb_path, 'r') as f:
-    lines = f.read().splitlines()
-  with open(outpdb_path, 'w') as f:
-    for iline in lines:
-      if len(iline) > 50 and iline.startswith('ATOM'):
-        chainID = ind2ID[int(iline[22:26])]
-        f.write(f"{iline[:21]}{chainID}{iline[22:]}\n")
+    # delete gap & change chain id
+    # renumber atom id & chain id (todo)
+    with open(inpdb_path, 'r') as f:
+      lines = f.read().splitlines()
+    with open(outpdb_path, 'w') as f:
+        for iline in lines:
+            if len(iline) > 50 and iline.startswith('ATOM'):
+                chainID = ind2ID[int(iline[22:26])]
+                f.write(f"{iline[:21]}{chainID}{iline[22:]}\n")
 
 
 def inflate(mask, crop_len):

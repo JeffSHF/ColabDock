@@ -1,6 +1,8 @@
 import os
+import argparse
 import numpy as np
-from config import config
+from importlib.util import spec_from_file_location, module_from_spec
+
 from colabdock.utils import prep_path
 from colabdock.model import ColabDock
 
@@ -9,6 +11,25 @@ np.set_printoptions(precision=3)
 
 os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "False"
 if __name__ == '__main__':
+    ######################################################################################
+    # suggested by and adopted from [@Regen Tsai](https://github.com/alchemistcai)
+    # Thanks a lot!
+    ######################################################################################
+    _current_cfg_path = './config.py'
+    parser = argparse.ArgumentParser(description='Integrated structure prediction of protein-protein docking with experimental restraints using ColabDock.')
+    parser.add_argument('--config', '-c', type=str, default=_current_cfg_path,
+                        help='Path of config file. Use `config.py` in the root path by default.')
+    args = parser.parse_args()
+    try:
+        spec = spec_from_file_location('config_custom', args.config)
+        config_module = module_from_spec(spec)
+        spec.loader.exec_module(config_module)
+        config = config_module.config
+    except (ModuleNotFoundError, ImportError):
+        print('Given module path is invalid. Use default config file.')
+        from config import config
+    ######################################################################################
+
     save_path = config.save_path
     prep_path(save_path)
     ######################################################################################
